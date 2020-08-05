@@ -4,19 +4,19 @@ import awsorgs.orgs
 import awsorgs.spec
 import awsorgs.accounts
 
-# args = {'--auth-account-id': None,
-#  '--config': '/Users/delhom/gitwork/axa/awscc-orchestrator-087048844615/prj/CF-foundation/awscc-aws-orgs/docs/.awsorgs/config.yaml',
-#  '--debug': 0,
-#  '--exec': False,
-#  '--help': False,
-#  '--master-account-id': None,
-#  '--org-access-role': None,
-#  '--quiet': False,
-#  '--spec-dir': None,
-#  '--version': False,
-#  'organization': False,
-#  'report': True,
-#  'reverse-setup': False}
+args = {'--auth-account-id': None,
+ '--config': '/Users/delhom/gitwork/aws-orgs-fork/docs/.awsorgs.split/master/config.yaml',
+ '--debug': 0,
+ '--exec': False,
+ '--help': False,
+ '--master-account-id': None,
+ '--org-access-role': None,
+ '--quiet': False,
+ '--spec-dir': None,
+ '--version': False,
+ 'organization': True,
+ 'report': False,
+ 'reverse-setup': False}
 
 # args = {'--auth-account-id': None,
 #  '--config': None,
@@ -34,25 +34,25 @@ import awsorgs.accounts
 #  '--force': True}
 
 
-# awsorgs.orgs.core(args)
+awsorgs.orgs.core(args)
 
 # '/Users/delhom/gitwork/axa/awscc-orchestrator-087048844615/prj/CF-foundation/awscc-aws-orgs/docs/.awsorgs/config.yaml'
 
 
-args = {'--auth-account-id': None,
- '--config': '/Users/delhom/gitwork/axa/awscc-aws-orgs-fork-428950684324/output_awsorgs/config.yaml',
- '--debug': 0,
- '--exec': True,
- '--help': False,
- '--invited-account-id': None,
- '--master-account-id': None,
- '--org-access-role': None,
- '--quiet': False,
- '--spec-dir': None,
- '--version': False,
- 'create': False,
- 'invite': False,
- 'report': False,
- 'update': True}
+# args = {'--auth-account-id': None,
+#  '--config': '/Users/delhom/gitwork/axa/awscc-aws-orgs-fork-428950684324/output_awsorgs/config.yaml',
+#  '--debug': 0,
+#  '--exec': True,
+#  '--help': False,
+#  '--invited-account-id': None,
+#  '--master-account-id': None,
+#  '--org-access-role': None,
+#  '--quiet': False,
+#  '--spec-dir': None,
+#  '--version': False,
+#  'create': False,
+#  'invite': False,
+#  'report': False,
+#  'update': True}
 
-awsorgs.accounts.core(args)
+# awsorgs.accounts.core(args)

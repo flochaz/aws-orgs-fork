@@ -409,6 +409,7 @@ def manage_policy_attachments(org_client, args, log, deployed, org_spec, ou_spec
                     TargetId=ou_id)
 
 
+
 def manage_ou(org_client, args, log, deployed, org_spec, ou_spec_list, parent_name, parent_path):
     """
     Recursive function to manage OrganizationalUnits in the AWS

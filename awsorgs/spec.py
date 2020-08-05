@@ -184,4 +184,26 @@ def validate_spec(log, args):
                 yamlfmt(validator.errors)))
         sys.exit(1)
     log.debug("spec_object validation succeeded")
+    root_spec = lookup(spec_object['organizational_units'], 'Name', 'root')
+    scan_manage_ou(spec_object['organizational_units'], '/')
+    ou = search_spec(root_spec, 'Name', 'Child_OU')
+
+
+
+
     return spec_object
+
+def Validate_spec_child(log, args, child_config_path, mounting_ou_path, spec_object):
+    child_args = {}
+    child_args['--config'] = child_config_path
+    child_args = load_config(log, child_args)
+
+    return spec_object
+
+
+def scan_manage_ou(spec, path):
+    for ou in spec:
+        ou['Path'] = path + ou['Name']
+        if 'Child_OU' in ou:
+            scan_manage_ou(ou['Child_OU'], ou['Path'] + '/')
+
