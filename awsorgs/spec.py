@@ -169,8 +169,7 @@ def validate_spec(log, args):
         dirnames[:] = [d for d in dirnames if not d.startswith('.')]
         for f in filenames:
             log.debug("considering file {}".format(f))
-            spec_from_file, errors = validate_spec_file(log,
-                    os.path.join(dirpath, f), validator, errors)
+            spec_from_file, errors = validate_spec_file(log, os.path.join(dirpath, f), validator, errors)
             if spec_from_file:
                 spec_object.update(spec_from_file)
     if errors:
