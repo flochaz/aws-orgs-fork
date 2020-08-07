@@ -74,6 +74,13 @@ def search_spec(spec, search_key, recurse_key):
             value += search_spec(child_spec, search_key, recurse_key)
     return sorted(value)
 
+def flatten_OUs(org_spec):
+    OUs={}
+    for ou in org_spec:
+        OUs[ou['Path']] = ou
+        if 'Child_OU' in ou:
+            OUs.update(flatten_OUs(ou['Child_OU']))
+    return OUs
 
 def ensure_absent(spec):
     """

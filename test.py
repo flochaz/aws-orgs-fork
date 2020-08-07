@@ -6,7 +6,7 @@ import awsorgs.accounts
 
 args = {'--auth-account-id': None,
  '--config': '/Users/delhom/gitwork/aws-orgs-fork/docs/.awsorgs.split/master/config.yaml',
- '--debug': 0,
+ '--debug': 1,
  '--exec': False,
  '--help': False,
  '--master-account-id': None,

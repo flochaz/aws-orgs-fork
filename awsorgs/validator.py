@@ -46,12 +46,14 @@ organizational_units:
     schema: organizational_unit
 sc_policies:
   required: False
+  nullable: True
   type: list
   schema:
     type: dict
     schema: sc_policy
 accounts:
   required: False
+  nullable: True
   type: list
   schema:
     type: dict
@@ -141,9 +143,11 @@ organizational_units:
   type: list
 sc_policies:
   required: True
+  nullable: True
   type: list
 accounts:
   required: True
+  nullable: True
   type: list
 users:
   required: False

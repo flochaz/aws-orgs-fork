@@ -46,7 +46,7 @@ def get_master_account_id(log, args, config):
     Determine the Org Master account id.  Try in order:
     cli option, config file, client.describe_organization()
     """
-    if args['--master-account-id']:
+    if '--master-account-id' in args and args['--master-account-id']:
         master_account_id = args['--master-account-id']
     else:
         master_account_id = config.get('master_account_id')
@@ -99,9 +99,9 @@ def load_config(log, args):
     config = scan_config_file(log, args)
     args['--master-account-id'] = get_master_account_id(log, args, config)
     args['--spec-dir'] = get_spec_dir(log, args, config)
-    if not args['--org-access-role']:
+    if not ('--org-access-role' in args and args['--org-access-role']):
         args['--org-access-role'] =  config.get('org_access_role')
-    if not args['--auth-account-id']:
+    if not ( '--auth-account-id' in args and args['--auth-account-id']):
         args['--auth-account-id'] =  config.get('auth_account_id')
     return args
 
@@ -184,24 +184,32 @@ def validate_spec(log, args):
                 yamlfmt(validator.errors)))
         sys.exit(1)
     log.debug("spec_object validation succeeded")
-    root_spec = lookup(spec_object['organizational_units'], 'Name', 'root')
-    scan_manage_ou(spec_object['organizational_units'], '/')
-    ou = search_spec(root_spec, 'Name', 'Child_OU')
+    
+    # root_spec = lookup(spec_object['organizational_units'], 'Name', 'root')
+    
+    scan_manage_ou_path(spec_object['organizational_units'], '/')
+    OUs = flatten_OUs(spec_object['organizational_units'])
+    # ous = search_spec(spec_object['organizational_units'][0], 'Path', 'Child_OU')
+    for path in OUs:
+        ou = OUs[path]
+        if 'IncludeConfigPath' in ou:
+            child_args = {}
+            child_args['--config'] = ou['IncludeConfigPath']
+            child_args = load_config(log, child_args)
 
-
-
+            child_spec = validate_spec(log, child_args)
+            
+            # merge child_spec in spec_object
+     
+            # merge child_spec in spec_object
+        
+            # spec_object = Validate_spec_child(log, args, ou['IncludeConfigPath'], ou['Path'], spec_object)
 
     return spec_object
 
-def Validate_spec_child(log, args, child_config_path, mounting_ou_path, spec_object):
-    child_args = {}
-    child_args['--config'] = child_config_path
-    child_args = load_config(log, child_args)
-
-    return spec_object
 
 
-def scan_manage_ou(spec, path):
+def scan_manage_ou_path(spec, path):
     for ou in spec:
         ou['Path'] = path + ou['Name']
         if 'Child_OU' in ou:
