@@ -180,8 +180,7 @@ def validate_spec(log, args):
     # validate aggregated spec_object
     validator = spec_validator(log)
     if not validator.validate(spec_object):
-        log.critical("spec_object validation failed:\n{}".format(
-                yamlfmt(validator.errors)))
+        log.critical("spec_object validation failed:\n{}".format(yamlfmt(validator.errors)))
         sys.exit(1)
     log.debug("spec_object validation succeeded")
     
@@ -200,10 +199,70 @@ def validate_spec(log, args):
             child_spec = validate_spec(log, child_args)
             
             # merge child_spec in spec_object
-     
+            # check if included config fit with current config
+            if child_args['--master-account-id'] != args['--master-account-id']:
+                log.critical("included config validation failed for {}. Value shoiuld be the same!".format('--master-account-id'))
+                sys.exit(1)
+            if child_args['--org-access-role'] != args['--org-access-role']:
+                log.critical("included config validation failed for {}. Value shoiuld be the same!".format('--org-access-role'))
+                sys.exit(1)
+            if child_args['--auth-account-id'] != args['--auth-account-id']:
+                log.critical("included config validation failed for {}. Value shoiuld be the same!".format('--auth-account-id'))
+                sys.exit(1)
+
+            
+            # check if monted point fit with included location
+            if len(child_spec['organizational_units']) != 1:
+                log.critical("included config validation failed. The included org tree should start with one single OU, corresponding to the Parent OU mounting point")
+                sys.exit(1)
+            if child_spec['organizational_units'][0]['Name'] != ou['Name']:
+                log.critical("included config validation failed. The included org tree should start with one single OU with the same Name as the corresponding Parent OU mounting point")
+                sys.exit(1)
+            if child_spec['organizational_units'][0]['MountingOUPath'] != ou['Path']:
+                log.critical("included config validation failed. The included org Mounting pont should the corresponding Parent OU path")
+                sys.exit(1)
+            if 'Child_OU' in ou:
+                log.critical("Mounting point OU should not have child OU already defined")
+                sys.exit(1)
+            if not 'Child_OU' in child_spec['organizational_units'][0]:
+                log.critical("The OU tree to include in not present in the configuration to include")
+                sys.exit(1)
+
+            # check if no duplicate for accounts
+            if 'accounts' in child_spec and child_spec['accounts'] and 'accounts' in spec_object and spec_object['accounts']:
+                for account in child_spec['accounts']:
+                    if lookup(spec_object['accounts'], 'Name', account['Name']):
+                        log.critical(("Duplicate account ({}) found when merging included config {}.").format(account['Name'], ou['IncludeConfigPath']))
+                        sys.exit(1)
+
+            # check if no ducplicate for SCPs
+            if 'sc_policies' in child_spec and child_spec['sc_policies'] and 'sc_policies' in spec_object and spec_object['sc_policies']:
+                for scp in child_spec['sc_policies']:
+                    if lookup(spec_object['sc_policies'], 'PolicyName', scp['PolicyName']):
+                        log.critical(("Duplicate SCP ({}) found when merging included config {}.").format(scp['PolicyName'], ou['IncludeConfigPath']))
+                        sys.exit(1)
+
+            # check if referenced accounts in the org tree of the included config are present into the accounts list ????
+            # check if referenced SCPs in the org tree of the included config are present into the SCPs list ????
+            
+            # finally merge org ou tree
             # merge child_spec in spec_object
-        
-            # spec_object = Validate_spec_child(log, args, ou['IncludeConfigPath'], ou['Path'], spec_object)
+            ou['Child_OU'] = child_spec['organizational_units'][0]['Child_OU']            
+            
+            # finally merge accounts
+            if 'accounts' in child_spec and child_spec['accounts']:
+                if 'accounts' in spec_object and spec_object['accounts']:
+                    spec_object['accounts'] += child_spec['accounts']
+                else:
+                    spec_object['accounts'] = child_spec['accounts']
+
+            # finally merge SCPs
+            if 'sc_policies' in child_spec and child_spec['sc_policies']:
+                if 'sc_policies' in spec_object and spec_object['sc_policies']:
+                    spec_object['sc_policies'] += child_spec['sc_policies']
+                else:
+                    spec_object['sc_policies'] = child_spec['sc_policies']
+     
 
     return spec_object
 
@@ -211,7 +270,10 @@ def validate_spec(log, args):
 
 def scan_manage_ou_path(spec, path):
     for ou in spec:
-        ou['Path'] = path + ou['Name']
+        if 'MountingOUPath' in ou:
+            ou['Path'] = ou['MountingOUPath']
+        else:
+            ou['Path'] = path + ou['Name']
         if 'Child_OU' in ou:
-            scan_manage_ou(ou['Child_OU'], ou['Path'] + '/')
+            scan_manage_ou_path(ou['Child_OU'], ou['Path'] + '/')
 
