@@ -200,48 +200,55 @@ def validate_spec(log, args):
             
             # merge child_spec in spec_object
             # check if included config fit with current config
+            error=0
             if child_args['--master-account-id'] != args['--master-account-id']:
                 log.critical("included config validation failed for {}. Value shoiuld be the same!".format('--master-account-id'))
-                sys.exit(1)
+                error = error +1
             if child_args['--org-access-role'] != args['--org-access-role']:
                 log.critical("included config validation failed for {}. Value shoiuld be the same!".format('--org-access-role'))
-                sys.exit(1)
+                error = error +1
             if child_args['--auth-account-id'] != args['--auth-account-id']:
                 log.critical("included config validation failed for {}. Value shoiuld be the same!".format('--auth-account-id'))
-                sys.exit(1)
+                error = error +1
 
             
             # check if monted point fit with included location
             if len(child_spec['organizational_units']) != 1:
                 log.critical("included config validation failed. The included org tree should start with one single OU, corresponding to the Parent OU mounting point")
-                sys.exit(1)
+                error = error +1
             if child_spec['organizational_units'][0]['Name'] != ou['Name']:
                 log.critical("included config validation failed. The included org tree should start with one single OU with the same Name as the corresponding Parent OU mounting point")
-                sys.exit(1)
+                error = error +1
             if child_spec['organizational_units'][0]['MountingOUPath'] != ou['Path']:
                 log.critical("included config validation failed. The included org Mounting pont should the corresponding Parent OU path")
-                sys.exit(1)
+                error = error +1
             if 'Child_OU' in ou:
                 log.critical("Mounting point OU should not have child OU already defined")
-                sys.exit(1)
+                error = error +1
             if not 'Child_OU' in child_spec['organizational_units'][0]:
                 log.critical("The OU tree to include in not present in the configuration to include")
-                sys.exit(1)
+                error = error +1
 
             # check if no duplicate for accounts
             if 'accounts' in child_spec and child_spec['accounts'] and 'accounts' in spec_object and spec_object['accounts']:
                 for account in child_spec['accounts']:
                     if lookup(spec_object['accounts'], 'Name', account['Name']):
                         log.critical(("Duplicate account ({}) found when merging included config {}.").format(account['Name'], ou['IncludeConfigPath']))
-                        sys.exit(1)
+                        error = error +1
 
             # check if no ducplicate for SCPs
             if 'sc_policies' in child_spec and child_spec['sc_policies'] and 'sc_policies' in spec_object and spec_object['sc_policies']:
                 for scp in child_spec['sc_policies']:
                     if lookup(spec_object['sc_policies'], 'PolicyName', scp['PolicyName']):
                         log.critical(("Duplicate SCP ({}) found when merging included config {}.").format(scp['PolicyName'], ou['IncludeConfigPath']))
-                        sys.exit(1)
+                        error = error +1
+                    if 'PrefixRequired' in ou and ou['PrefixRequired'] and not (scp['PolicyName'].startswith(ou['PrefixRequired'] + '.')):
+                        log.critical(("SCP ({}) doesn't match the namming convention defined with prefix {}.").format(scp['PolicyName'], ou['PrefixRequired']))
+                        error = error +1
 
+            if error:
+                log.critical("schema validation failed. Run in debug mode for details")
+                sys.exit(1)
             # check if referenced accounts in the org tree of the included config are present into the accounts list ????
             # check if referenced SCPs in the org tree of the included config are present into the SCPs list ????
             

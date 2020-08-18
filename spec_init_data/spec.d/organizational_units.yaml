@@ -21,6 +21,10 @@
 #   MountingOUPath (string):
 #                   For an included configuration, this is the reference to the mounting point path into the OUs tree.
 #                   This exist only if the upper name of the tree is not "root". if not, raise an exception
-#                   The upper name of the tree is equal to the OU name of the mointing point 
+#                   The upper name of the tree is equal to the OU name of the mointing point
+#   PrefixRequired:
+#                   Only used with IncludeConfigPath.
+#                   Prefix value to use to validate naming convention for included SCP name
+
 
 organizational_units:

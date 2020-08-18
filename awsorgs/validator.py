@@ -188,6 +188,10 @@ MountingOUPath:
   required: False
   nullable: True
   type: string
+PrefixRequired:
+  required: False
+  nullable: True
+  type: string
 Accounts:
   required: False
   nullable: True

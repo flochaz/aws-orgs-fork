@@ -56,3 +56,11 @@ awsorgs.orgs.core(args)
 #  'update': True}
 
 # awsorgs.accounts.core(args)
+
+
+# awsorgs reverse-setup 
+# --master-account-id 428950684324 
+# --org-access-role OrganizationAccountAccessRole 
+# --output-dir ./output_awsorgs 
+# --template-dir ./spec_init_data 
+# --force --exec
